@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.reknown.fastercrystals"
-version = "2.2.1"
+version = "2.2.1-legacygrim2"
 description = "Uses packets to manually break/place crystals"
 
 java {
@@ -88,7 +88,7 @@ bukkitPluginYaml {
     authors.add("Jyguy")
     apiVersion = "1.20.5"
     foliaSupported = true
-    depend.addAll("packetevents")
+    depend.addAll("packetevents", "GrimAC")
     softDepend.addAll("PlaceholderAPI")
     commands.register("fastercrystals") {
         usage = "/fastercrystals <on/off|toggle>"
