@@ -25,9 +25,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityPlaceEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.reknown.fastercrystals.api.FasterCrystalsAPI;
@@ -103,7 +106,7 @@ public class FasterCrystals extends JavaPlugin {
         }
     }
 
-    public void spawnCrystal(Location loc, Player player, ItemStack item) {
+    public void spawnCrystal(Location loc, Player player, ItemStack item, EquipmentSlot hand) {
         Location clonedLoc = loc.clone().subtract(0.5, 0.0, 0.5);
         if (!AIR_TYPES.contains(clonedLoc.getBlock().getType())) return;
 
@@ -112,7 +115,17 @@ public class FasterCrystals extends JavaPlugin {
                 entity -> !(entity instanceof Player p) || p.getGameMode() != GameMode.SPECTATOR));
 
         if (nearbyEntities.isEmpty()) {
-            loc.getWorld().spawn(clonedLoc.subtract(0.0, 1.0, 0.0), EnderCrystal.class, entity -> entity.setShowingBottom(false));
+            EnderCrystal crystal = loc.getWorld().createEntity(clonedLoc.subtract(0.0, 1.0, 0.0), EnderCrystal.class);
+            crystal.setShowingBottom(false);
+            EntityPlaceEvent event = new EntityPlaceEvent(crystal, player,
+                    loc.getBlock().getRelative(BlockFace.DOWN), BlockFace.UP, hand);
+            if (!event.callEvent()) return;
+            try {
+                loc.getWorld().addEntity(crystal);
+            } finally {
+                if (!crystal.isValid()) event.setCancelled(true);
+            }
+            if (event.isCancelled()) return;
 
             if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
                 item.setAmount(item.getAmount() - 1);
