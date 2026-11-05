@@ -8,11 +8,10 @@
 name: Java CI with Gradle
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ "master", "legacygrim" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master", "legacygrim" ]
+    branches: [ "master" ]
 
 jobs:
   build:
